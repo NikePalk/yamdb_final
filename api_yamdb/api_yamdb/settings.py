@@ -9,7 +9,7 @@ SECRET_KEY = (
     'my_secret_key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEB')
+DEBUG = os.getenv('DEB', default=False)
 
 ALLOWED_HOSTS = ['*']
 
