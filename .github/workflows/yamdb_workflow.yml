@@ -47,7 +47,7 @@ jobs:
         uses: docker/build-push-action@v2 
         with:
           push: true
-          tags: nikepalk/api_yamdb:latest
+          tags: nikepalk/yamdb_api:latest
           file: api_yamdb/Dockerfile
   
   deploy:
