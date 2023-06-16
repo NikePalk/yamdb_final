@@ -9,7 +9,7 @@ services:
       - ./.env
 
   web:
-    image: nikepalk/yamdb_finalll:latest
+    image: nikepalk/yamdb_fin:latest
     restart: always
     volumes:
       - static_value:/app/static/
