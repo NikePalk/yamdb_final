@@ -1,18 +1,45 @@
 from django.urls import include, path
-from rest_framework import routers
+from rest_framework.routers import SimpleRouter
 
-from .views import CommentViewSet, FollowViewSet, GroupViewSet, PostViewSet
+from .views import (APIGetToken, APISignup, CategoryViewSet, CommentViewSet,
+                    GenreViewSet, ReviewViewSet, TitleViewSet, UsersViewSet)
 
-v1_router = routers.DefaultRouter()
-v1_router.register(r'posts', PostViewSet, basename='posts')
-v1_router.register(r'groups', GroupViewSet, basename='groups')
-v1_router.register(r'follow', FollowViewSet, basename='follow')
-v1_router.register(r'posts/(?P<post_id>\d+)/comments',
-                   CommentViewSet, basename='comments')
+app_name = 'api'
 
+router = SimpleRouter()
+router.register(
+    r'titles/(?P<title_id>\d+)/reviews',
+    ReviewViewSet,
+    basename='reviews'
+)
+router.register(
+    r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
+    CommentViewSet,
+    basename='comments'
+)
+router.register(
+    'users',
+    UsersViewSet,
+    basename='users'
+)
+router.register(
+    'categories',
+    CategoryViewSet,
+    basename='сategories'
+)
+router.register(
+    'titles',
+    TitleViewSet,
+    basename='titles'
+)
+router.register(
+    'genres',
+    GenreViewSet,
+    basename='genres'
+)
 
 urlpatterns = [
-    path('v1/', include(v1_router.urls)),
-    path('v1/', include('djoser.urls')),
-    path('v1/', include('djoser.urls.jwt')),
+    path('v1/auth/token/', APIGetToken.as_view(), name='get_token'),
+    path('v1/', include(router.urls)),
+    path('v1/auth/signup/', APISignup.as_view(), name='signup'),
 ]
