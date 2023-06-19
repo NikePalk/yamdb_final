@@ -1,40 +1,50 @@
-from rest_framework import permissions
+from rest_framework.permissions import (SAFE_METHODS, BasePermission,
+                                        IsAuthenticatedOrReadOnly)
+from reviews.models import User
 
 
-class AdminOnly(permissions.BasePermission):
-    def has_permission(self, request, view):
-        return (
-            request.user.is_admin
-            or request.user.is_staff
-        )
-
+class IsStaffOrAuthorOrReadOnly(IsAuthenticatedOrReadOnly):
+    """Разрешения для действий с отзывами и комментариями"""
     def has_object_permission(self, request, view, obj):
         return (
-            request.user.is_admin
-            or request.user.is_staff
-        )
-
-
-class IsAdminUserOrReadOnly(permissions.BasePermission):
-    def has_permission(self, request, view):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        if request.user.is_authenticated:
-            return request.user.is_admin
-        return False
-
-
-class AdminModeratorAuthorPermission(permissions.BasePermission):
-    def has_permission(self, request, view):
-        return (
-            request.method in permissions.SAFE_METHODS
+            obj.author == request.user
+            or request.method in SAFE_METHODS
             or request.user.is_authenticated
+            and request.user.role == User.ADMIN  # админ
+            or request.user.is_authenticated
+            and request.user.role == User.MODERATOR  # модератор
+        )
+
+
+class IsAdminOrReadOnly(BasePermission):
+    """Разрешения для действий с названиями, жанрами и категориями"""
+    def has_permission(self, request, view):
+        return (
+            request.method in SAFE_METHODS
+            or request.user.is_authenticated
+            and request.user.role == User.ADMIN  # админ
+            or request.user.is_superuser
+        )
+
+
+class IsAdmin(BasePermission):
+    """Разрешения для действий с пользователями от имени администратора"""
+    def has_permission(self, request, view):
+        return (
+            request.user.is_authenticated
+            and request.user.role == User.ADMIN  # админ
+            or request.user.is_staff
+            or request.user.is_superuser
         )
 
     def has_object_permission(self, request, view, obj):
-        return (
-            request.method in permissions.SAFE_METHODS
-            or obj.author == request.user
-            or request.user.is_moderator
-            or request.user.is_admin
-        )
+        return request.method in ('GET', 'POST', 'PATCH', 'DELETE')
+
+
+class MePermission(BasePermission):
+    """Разрешения для действий с пользователями для пользователей"""
+    def has_permission(self, request, view):
+        return request.user.is_authenticated
+
+    def has_object_permission(self, view, request, obj):
+        return request.method in ('PATCH', 'GET')
