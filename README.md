@@ -1,4 +1,4 @@
-![Yamdb Workflow Status](https://github.com/nikepalk/yamdb_final/actions/workflows/yamdb_workflow.yml/badge.svg)
+![Yamdb Workflow Status](https://github.com/NikePalk/yamdb_final/actions/workflows/yamdb_workflow.yml/badge.svg?branch=master&event=push)
 # CI и CD проекта api_yamdb
 REST API проект для сервиса YaMDb — сбор отзывов о фильмах, книгах или музыке.
 
