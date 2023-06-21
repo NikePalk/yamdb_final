@@ -1,57 +1,55 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 
-from .models import Category, Comment, Genre, GenreTitle, Review, Title
+from .models import Category, Comment, Genre, Review, Title, User
+
+admin.site.register(User, UserAdmin)
 
 
+@admin.register(Genre)
 class GenreAdmin(admin.ModelAdmin):
-    list_display = (
-        'pk',
-        'name',
-        'slug'
-    )
-    list_editable = ('name', 'slug',)
-    search_fields = ('name', 'slug')
+    list_display = ('pk', 'name', 'slug')
+    search_fields = ('name',)
+    list_filter = ('name',)
     empty_value_display = '-пусто-'
 
 
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'name', 'slug')
+    search_fields = ('name',)
+    list_filter = ('name',)
+    empty_value_display = '-пусто-'
+
+
+@admin.register(Title)
 class TitleAdmin(admin.ModelAdmin):
     list_display = (
-        'pk',
-        'name',
-        'year',
-        'category',
-        'get_genre'
+        'pk', 'name', 'year',
+        'description', 'category',
     )
-    list_editable = ('name', 'year', 'category')
-    search_fields = ('name', 'year', 'category')
+    search_fields = ('name',)
+    list_filter = ('name',)
     empty_value_display = '-пусто-'
 
 
-class CategoryAdmin(admin.ModelAdmin):
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
     list_display = (
-        'pk',
-        'name',
-        'slug'
+        'pk', 'title', 'text',
+        'author', 'score', 'pub_date',
     )
-    list_editable = ('name', 'slug',)
-    search_fields = ('name', 'slug')
+    search_fields = ('title', 'author', 'pub_date')
+    list_filter = ('pub_date',)
     empty_value_display = '-пусто-'
 
 
-class GenreTitleAdmin(admin.ModelAdmin):
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
     list_display = (
-        'pk',
-        'title',
-        'genre'
+        'pk', 'review', 'text',
+        'author', 'pub_date',
     )
-    list_editable = ('title', 'genre')
-    search_fields = ('title', 'genre')
+    search_fields = ('review', 'author', 'pub_date')
+    list_filter = ('pub_date',)
     empty_value_display = '-пусто-'
-
-
-admin.site.register(GenreTitle, GenreTitleAdmin)
-admin.site.register(Title, TitleAdmin)
-admin.site.register(Category, CategoryAdmin)
-admin.site.register(Genre, GenreAdmin)
-admin.site.register(Comment)
-admin.site.register(Review)

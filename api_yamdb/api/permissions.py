@@ -1,44 +1,50 @@
-from rest_framework import permissions, status
+from rest_framework.permissions import (SAFE_METHODS, BasePermission,
+                                        IsAuthenticatedOrReadOnly)
+from reviews.models import User
 
 
-class IsAdminOrReadOnly(permissions.BasePermission):
-
-    def has_permission(self, request, view):
-        safe = request.method in permissions.SAFE_METHODS
-        if request.user.is_authenticated:
-            return safe or request.user._is_admin
-        return safe
-
-
-class ReadOnly(permissions.BasePermission):
+class IsStaffOrAuthorOrReadOnly(IsAuthenticatedOrReadOnly):
+    """Разрешения для действий с отзывами и комментариями"""
     def has_object_permission(self, request, view, obj):
-        return request.method == "GET"
+        return (
+            obj.author == request.user
+            or request.method in SAFE_METHODS
+            or request.user.is_authenticated
+            and request.user.role == User.ADMIN  # админ
+            or request.user.is_authenticated
+            and request.user.role == User.MODERATOR  # модератор
+        )
 
 
-class AdminOrSuperuser(permissions.BasePermission):
+class IsAdminOrReadOnly(BasePermission):
+    """Разрешения для действий с названиями, жанрами и категориями"""
     def has_permission(self, request, view):
-        if request.user.is_authenticated:
-            return request.user._is_admin
-        return False
+        return (
+            request.method in SAFE_METHODS
+            or request.user.is_authenticated
+            and request.user.role == User.ADMIN  # админ
+            or request.user.is_superuser
+        )
 
 
-class IsUserAnonModerAdmin(permissions.BasePermission):
+class IsAdmin(BasePermission):
+    """Разрешения для действий с пользователями от имени администратора"""
     def has_permission(self, request, view):
-        return (request.method in permissions.SAFE_METHODS
-                or request.user.is_authenticated)
+        return (
+            request.user.is_authenticated
+            and request.user.role == User.ADMIN  # админ
+            or request.user.is_staff
+            or request.user.is_superuser
+        )
 
     def has_object_permission(self, request, view, obj):
-        if request.method == "DELETE":
-            if request.user == obj.author:
-                return (True, status.HTTP_403_FORBIDDEN)
-            if request.user._is_moderator:
-                return (True, status.HTTP_204_NO_CONTENT)
+        return request.method in ('GET', 'POST', 'PATCH', 'DELETE')
 
-        safe = request.method in permissions.SAFE_METHODS
-        if request.user.is_authenticated:
-            admin_or_author = (
-                request.user._is_admin
-                or request.user == obj.author
-            )
-            return safe or admin_or_author
-        return safe
+
+class MePermission(BasePermission):
+    """Разрешения для действий с пользователями для пользователей"""
+    def has_permission(self, request, view):
+        return request.user.is_authenticated
+
+    def has_object_permission(self, view, request, obj):
+        return request.method in ('PATCH', 'GET')
