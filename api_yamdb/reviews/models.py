@@ -1,5 +1,4 @@
 from django.contrib.auth.models import AbstractUser
-from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from reviews.validators import validate_slug, validate_year
@@ -60,6 +59,7 @@ class User(AbstractUser):
 
     def __str__(self):
         return f'{self.username} {self.email} {self.role}'
+
 
 class Genre(GenreCategory):
     """Жанры произведений."""
