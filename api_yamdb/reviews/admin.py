@@ -1,47 +1,57 @@
 from django.contrib import admin
 
-from .models import Category, Comment, Genre, Review, Title
-
-
-class ReviewAdmin(admin.ModelAdmin):
-    list_display = ('title', 'text', 'score')
-    search_fields = ('title',)
-    list_filter = ('score',)
-
-
-class CommentAdmin(admin.ModelAdmin):
-    list_display = ('review', 'text')
-    search_fields = ('review',)
+from .models import Category, Comment, Genre, GenreTitle, Review, Title
 
 
 class GenreAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug')
-    search_fields = ('name',)
-
-
-class TabularInlineGenre(admin.TabularInline):
-    model = Genre.titles.through
+    list_display = (
+        'pk',
+        'name',
+        'slug'
+    )
+    list_editable = ('name', 'slug',)
+    search_fields = ('name', 'slug')
+    empty_value_display = '-пусто-'
 
 
 class TitleAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'year', 'description', 'get_genres')
-    search_fields = ('name', 'category', 'year')
-    list_filter = ('category', 'genre')
-    inlines = (TabularInlineGenre, )
-
-    def get_genres(self, title):
-        return ', '.join(genre.name for genre in title.genre.all())
-
-    get_genres.short_description = 'Жанры'
+    list_display = (
+        'pk',
+        'name',
+        'year',
+        'category',
+        'get_genre'
+    )
+    list_editable = ('name', 'year', 'category')
+    search_fields = ('name', 'year', 'category')
+    empty_value_display = '-пусто-'
 
 
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug')
-    search_fields = ('name',)
+    list_display = (
+        'pk',
+        'name',
+        'slug'
+    )
+    list_editable = ('name', 'slug',)
+    search_fields = ('name', 'slug')
+    empty_value_display = '-пусто-'
 
 
-admin.site.register(Review, ReviewAdmin)
-admin.site.register(Comment, CommentAdmin)
+class GenreTitleAdmin(admin.ModelAdmin):
+    list_display = (
+        'pk',
+        'title',
+        'genre'
+    )
+    list_editable = ('title', 'genre')
+    search_fields = ('title', 'genre')
+    empty_value_display = '-пусто-'
+
+
+admin.site.register(GenreTitle, GenreTitleAdmin)
 admin.site.register(Title, TitleAdmin)
-admin.site.register(Genre, GenreAdmin)
 admin.site.register(Category, CategoryAdmin)
+admin.site.register(Genre, GenreAdmin)
+admin.site.register(Comment)
+admin.site.register(Review)
