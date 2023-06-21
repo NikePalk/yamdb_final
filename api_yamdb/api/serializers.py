@@ -22,7 +22,6 @@ class SingUpSerializer(serializers.ModelSerializer):
             username=self.validated_data['username'],
             email=self.validated_data['email'],
         )
-        return user
 
 
 class ConfirmationCodeSerializer(serializers.Serializer):
