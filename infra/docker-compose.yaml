@@ -12,6 +12,7 @@ services:
     image: nikepalk/yamdbwww:latest
     restart: always
     volumes:
+      - ../api_yamdb/:/app/
       - static_value:/app/static/
       - media_value:/app/media/
     depends_on:
@@ -26,6 +27,7 @@ services:
       - "80:80"
 
     volumes:
+      
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
 
       - static_value:/var/html/static/
