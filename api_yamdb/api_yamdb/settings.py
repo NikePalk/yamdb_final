@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -16,6 +17,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'users',
+    'api',
+    'reviews',
 ]
 
 MIDDLEWARE = [
@@ -90,3 +96,72 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+AUTH_USER_MODEL = 'users.CustomUser'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 5
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'UPDATE_LAST_LOGIN': False,
+
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'VERIFYING_KEY': None,
+    'AUDIENCE': None,
+    'ISSUER': None,
+    'JWK_URL': None,
+    'LEEWAY': 0,
+
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
+
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+    'TOKEN_USER_CLASS': 'rest_framework_simplejwt.models.TokenUser',
+
+    'JTI_CLAIM': 'jti',
+
+    'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+}
+
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
+CONTACT_EMAIL = os.getenv('CONTACT_EMAIL')
+
+CONFIRMATION_CODE_LEN = 5
+USER = 'user'
+MODERATOR = 'moderator'
+ADMIN = 'admin'
+SHORT_TEXT_LENGTH = 15
+NAME_LENGTH = 256
+SLUG_LENGTH = 50
+USER_NAMES_LENGTH = 150
+EMAIL_LENGTH = 254
+MIN_SCORE = 1
+MAX_SCORE = 10
+
+SLUG_PATTERN = r'^[-a-zA-Z0-9_]+$'
+USERNAME_PATTERN = r'^[\w.@+-]+$'
+DUPLICATE_EMAIL_MESSAGE = 'Пользователь с таким email уже зарегистрирован, но указан неверный username.'
+DUPLICATE_USERNAME_MESSAGE = 'Пользователь с таким username уже зарегистрирован, но указан неверный email.'
+SLUG_ERROR_MESSAGE = f'Адрес категории не соответствует шаблону: {SLUG_PATTERN}'
+NAME_ME_ERROR_MESSAGE = 'Запрещено использовать "me" в качестве никнейма'
+YEAR_ERROR_MESSAGE = 'Значение года не может быть больше текущего'
