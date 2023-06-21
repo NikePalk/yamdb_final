@@ -41,3 +41,4 @@ def validate_slug(value):
     if not re.fullmatch(settings.SLUG_PATTERN, value):
         raise ValidationError(settings.SLUG_ERROR_MESSAGE)
     return value
+    

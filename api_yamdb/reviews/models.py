@@ -1,8 +1,8 @@
+from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from reviews.validators import validate_slug, validate_year
-from users.models import CustomUser as User
 
 
 class GenreCategory(models.Model):
@@ -22,6 +22,44 @@ class GenreCategory(models.Model):
     def __str__(self):
         return self.name
 
+
+class User(AbstractUser):
+    """Настраиваемая модель пользователя"""
+    USER = 'user'
+    MODERATOR = 'moderator'
+    ADMIN = 'admin'
+    ROLE_CHOICES = [
+        (USER, 'user'),
+        (MODERATOR, 'moderator'),
+        (ADMIN, 'admin'),
+    ]
+    email = models.EmailField(
+        'Электронная почта',
+        max_length=254,
+        unique=True,
+    )
+    bio = models.TextField(
+        'Биография',
+        blank=True,
+    )
+    role = models.CharField(
+        'Роль пользователя',
+        max_length=12,
+        choices=ROLE_CHOICES,
+        default=USER
+    )
+    REQUIRED_FIELDS = ['email', ]
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['username', 'email'],
+                name='unique_username_email',
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.username} {self.email} {self.role}'
 
 class Genre(GenreCategory):
     """Жанры произведений."""
