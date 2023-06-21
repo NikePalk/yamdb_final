@@ -18,11 +18,10 @@ class SingUpSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
-        user = User.objects.create(
+        return User.objects.create(
             username=self.validated_data['username'],
             email=self.validated_data['email'],
         )
-        return user
 
 
 class ConfirmationCodeSerializer(serializers.Serializer):
